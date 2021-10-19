@@ -54,6 +54,14 @@ func New(l *lexer.Lexer) *Parser {
 	}
 
 	p.prefixParseFns = make(map[token.TokenType]prefixParseFn)
+	// 意味的には, IDENT・INTは前置式ではないので分離した方が意図は伝わりやすそう
+	/*
+		if fn, ok := prefixParseFns[token.TokenType]; ok {
+			fn()
+		} eles {
+			parseHogeLiteral()
+		}
+	*/
 	p.registerPrefix(token.IDENT, p.parseIdentifier)
 	p.registerPrefix(token.INT, p.parseIntegerLiteral)
 	p.registerPrefix(token.BANG, p.parsePrefixExpression)
@@ -204,7 +212,7 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 	if p.peekTokenIs(token.SEMICOLON) {
 		p.NextToken()
 	}
-	
+
 	return stmt
 }
 
@@ -346,6 +354,7 @@ func (p *Parser) parseIntegerLiteral() ast.Expression {
 	lit.Value = value
 	return lit
 }
+
 
 func (p *Parser) parseBooleanLiteral() ast.Expression {
 	return &ast.BooleanLiteral{Token: p.curToken, Value: p.curTokenIs(token.TRUE)}
